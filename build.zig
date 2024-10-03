@@ -1,9 +1,15 @@
 const std = @import("std");
 
+const required_zig_version = std.SemanticVersion.parse("0.14.0-dev.1702+26d35cc11") catch unreachable;
+
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
 pub fn build(b: *std.Build) void {
+    if (comptime @import("builtin").zig_version.order(required_zig_version) == .lt) {
+        std.debug.print("Warning: Your version of Zig too old. You will need to download a newer build\n", .{});
+        std.os.exit(1);
+    }
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
